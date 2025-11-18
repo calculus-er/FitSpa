@@ -6,29 +6,61 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useNavigate } from 'react-router-dom';
 import { Activity } from 'lucide-react';
+import { signIn, signUp } from '@/lib/firebase/auth';
+import { useToast } from '@/hooks/use-toast';
 
 const Auth = () => {
   const navigate = useNavigate();
+  const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
+  const [loginEmail, setLoginEmail] = useState('');
+  const [loginPassword, setLoginPassword] = useState('');
+  const [signupName, setSignupName] = useState('');
+  const [signupEmail, setSignupEmail] = useState('');
+  const [signupPassword, setSignupPassword] = useState('');
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
     
-    // Simulate auth - replace with actual auth later
-    setTimeout(() => {
+    try {
+      await signIn({ email: loginEmail, password: loginPassword });
+      toast({
+        title: 'Success!',
+        description: 'Signed in successfully',
+      });
       navigate('/workout');
-    }, 1000);
+    } catch (error: any) {
+      toast({
+        title: 'Error',
+        description: error.message || 'Failed to sign in',
+        variant: 'destructive',
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
     
-    // Simulate auth - replace with actual auth later
-    setTimeout(() => {
+    try {
+      await signUp({ email: signupEmail, password: signupPassword, name: signupName });
+      toast({
+        title: 'Success!',
+        description: 'Account created successfully',
+      });
       navigate('/workout');
-    }, 1000);
+    } catch (error: any) {
+      toast({
+        title: 'Error',
+        description: error.message || 'Failed to create account',
+        variant: 'destructive',
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -64,6 +96,8 @@ const Auth = () => {
                     type="email"
                     placeholder="you@example.com"
                     required
+                    value={loginEmail}
+                    onChange={(e) => setLoginEmail(e.target.value)}
                     className="bg-secondary border-border"
                   />
                 </div>
@@ -75,6 +109,8 @@ const Auth = () => {
                     type="password"
                     placeholder="••••••••"
                     required
+                    value={loginPassword}
+                    onChange={(e) => setLoginPassword(e.target.value)}
                     className="bg-secondary border-border"
                   />
                 </div>
@@ -99,6 +135,8 @@ const Auth = () => {
                     type="text"
                     placeholder="John Doe"
                     required
+                    value={signupName}
+                    onChange={(e) => setSignupName(e.target.value)}
                     className="bg-secondary border-border"
                   />
                 </div>
@@ -110,6 +148,8 @@ const Auth = () => {
                     type="email"
                     placeholder="you@example.com"
                     required
+                    value={signupEmail}
+                    onChange={(e) => setSignupEmail(e.target.value)}
                     className="bg-secondary border-border"
                   />
                 </div>
@@ -121,6 +161,9 @@ const Auth = () => {
                     type="password"
                     placeholder="••••••••"
                     required
+                    value={signupPassword}
+                    onChange={(e) => setSignupPassword(e.target.value)}
+                    minLength={6}
                     className="bg-secondary border-border"
                   />
                 </div>

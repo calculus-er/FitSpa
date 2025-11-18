@@ -3,32 +3,51 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { ArrowLeft, TrendingUp, Calendar, Target, Flame } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
-
-// Sample data
-const weeklyData = [
-  { day: 'Mon', reps: 85, duration: 25 },
-  { day: 'Tue', reps: 95, duration: 30 },
-  { day: 'Wed', reps: 78, duration: 22 },
-  { day: 'Thu', reps: 110, duration: 35 },
-  { day: 'Fri', reps: 125, duration: 40 },
-  { day: 'Sat', reps: 105, duration: 32 },
-  { day: 'Sun', reps: 92, duration: 28 },
-];
-
-const exerciseStats = [
-  { exercise: 'Push-ups', completed: 420, target: 500 },
-  { exercise: 'Squats', completed: 680, target: 750 },
-  { exercise: 'Plank', completed: 180, target: 200 },
-  { exercise: 'Lunges', completed: 340, target: 400 },
-];
+import { useAuth } from '@/contexts/AuthContext';
+import { useAnalytics } from '@/hooks/useAnalytics';
+import { exercises } from '@/lib/workout/exerciseConfig';
 
 const Analytics = () => {
   const navigate = useNavigate();
+  const { user } = useAuth();
+  const { analytics, loading } = useAnalytics(user?.uid || null);
 
-  const totalWorkouts = 28;
-  const totalReps = 2840;
-  const totalMinutes = 672;
-  const streak = 7;
+  // Format weekly data for chart
+  const weeklyData = analytics?.weeklyStats?.map((stat) => {
+    const date = new Date(stat.date);
+    const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+    return {
+      day: dayNames[date.getDay()],
+      reps: stat.reps,
+      duration: stat.duration,
+    };
+  }) || [];
+
+  // Format exercise stats
+  const exerciseStats = exercises.map((exercise) => {
+    const stats = analytics?.exerciseStats?.[exercise.id] || { completed: 0, target: 0 };
+    return {
+      exercise: exercise.name,
+      completed: stats.completed,
+      target: exercise.target * (analytics?.totalWorkouts || 0), // Estimate target based on workouts
+    };
+  });
+
+  const totalWorkouts = analytics?.totalWorkouts || 0;
+  const totalReps = analytics?.totalReps || 0;
+  const totalMinutes = analytics?.totalMinutes || 0;
+  const streak = analytics?.currentStreak || 0;
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gradient-hero flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+          <p className="text-muted-foreground">Loading analytics...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-hero">
@@ -65,7 +84,7 @@ const Analytics = () => {
             </CardHeader>
             <CardContent>
               <div className="text-4xl font-bold text-primary">{totalWorkouts}</div>
-              <p className="text-sm text-muted-foreground mt-1">This month</p>
+              <p className="text-sm text-muted-foreground mt-1">All time</p>
             </CardContent>
           </Card>
 
@@ -91,7 +110,7 @@ const Analytics = () => {
             </CardHeader>
             <CardContent>
               <div className="text-4xl font-bold text-success">{totalMinutes}</div>
-              <p className="text-sm text-muted-foreground mt-1">Minutes this month</p>
+              <p className="text-sm text-muted-foreground mt-1">Minutes total</p>
             </CardContent>
           </Card>
 
@@ -109,92 +128,100 @@ const Analytics = () => {
           </Card>
         </div>
 
-        <div className="grid lg:grid-cols-2 gap-6">
-          {/* Weekly Progress Chart */}
-          <Card className="border-border bg-card/80 backdrop-blur-xl">
-            <CardHeader>
-              <CardTitle>Weekly Progress</CardTitle>
-              <CardDescription>Your performance over the last 7 days</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <ResponsiveContainer width="100%" height={300}>
-                <LineChart data={weeklyData}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
-                  <XAxis 
-                    dataKey="day" 
-                    stroke="hsl(var(--muted-foreground))"
-                  />
-                  <YAxis stroke="hsl(var(--muted-foreground))" />
-                  <Tooltip 
-                    contentStyle={{ 
-                      backgroundColor: 'hsl(var(--card))',
-                      border: '1px solid hsl(var(--border))',
-                      borderRadius: '8px'
-                    }}
-                  />
-                  <Legend />
-                  <Line 
-                    type="monotone" 
-                    dataKey="reps" 
-                    stroke="hsl(var(--primary))" 
-                    strokeWidth={3}
-                    dot={{ fill: 'hsl(var(--primary))', r: 5 }}
-                    name="Reps"
-                  />
-                  <Line 
-                    type="monotone" 
-                    dataKey="duration" 
-                    stroke="hsl(var(--accent))" 
-                    strokeWidth={3}
-                    dot={{ fill: 'hsl(var(--accent))', r: 5 }}
-                    name="Duration (min)"
-                  />
-                </LineChart>
-              </ResponsiveContainer>
-            </CardContent>
-          </Card>
+        {weeklyData.length > 0 ? (
+          <div className="grid lg:grid-cols-2 gap-6">
+            {/* Weekly Progress Chart */}
+            <Card className="border-border bg-card/80 backdrop-blur-xl">
+              <CardHeader>
+                <CardTitle>Weekly Progress</CardTitle>
+                <CardDescription>Your performance over the last 7 days</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <ResponsiveContainer width="100%" height={300}>
+                  <LineChart data={weeklyData}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                    <XAxis 
+                      dataKey="day" 
+                      stroke="hsl(var(--muted-foreground))"
+                    />
+                    <YAxis stroke="hsl(var(--muted-foreground))" />
+                    <Tooltip 
+                      contentStyle={{ 
+                        backgroundColor: 'hsl(var(--card))',
+                        border: '1px solid hsl(var(--border))',
+                        borderRadius: '8px'
+                      }}
+                    />
+                    <Legend />
+                    <Line 
+                      type="monotone" 
+                      dataKey="reps" 
+                      stroke="hsl(var(--primary))" 
+                      strokeWidth={3}
+                      dot={{ fill: 'hsl(var(--primary))', r: 5 }}
+                      name="Reps"
+                    />
+                    <Line 
+                      type="monotone" 
+                      dataKey="duration" 
+                      stroke="hsl(var(--accent))" 
+                      strokeWidth={3}
+                      dot={{ fill: 'hsl(var(--accent))', r: 5 }}
+                      name="Duration (min)"
+                    />
+                  </LineChart>
+                </ResponsiveContainer>
+              </CardContent>
+            </Card>
 
-          {/* Exercise Breakdown */}
+            {/* Exercise Breakdown */}
+            <Card className="border-border bg-card/80 backdrop-blur-xl">
+              <CardHeader>
+                <CardTitle>Exercise Breakdown</CardTitle>
+                <CardDescription>Progress across different exercises</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <ResponsiveContainer width="100%" height={300}>
+                  <BarChart data={exerciseStats}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                    <XAxis 
+                      dataKey="exercise" 
+                      stroke="hsl(var(--muted-foreground))"
+                      tick={{ fontSize: 12 }}
+                    />
+                    <YAxis stroke="hsl(var(--muted-foreground))" />
+                    <Tooltip 
+                      contentStyle={{ 
+                        backgroundColor: 'hsl(var(--card))',
+                        border: '1px solid hsl(var(--border))',
+                        borderRadius: '8px'
+                      }}
+                    />
+                    <Legend />
+                    <Bar 
+                      dataKey="completed" 
+                      fill="hsl(var(--success))" 
+                      radius={[8, 8, 0, 0]}
+                      name="Completed"
+                    />
+                    <Bar 
+                      dataKey="target" 
+                      fill="hsl(var(--muted))" 
+                      radius={[8, 8, 0, 0]}
+                      name="Target"
+                    />
+                  </BarChart>
+                </ResponsiveContainer>
+              </CardContent>
+            </Card>
+          </div>
+        ) : (
           <Card className="border-border bg-card/80 backdrop-blur-xl">
-            <CardHeader>
-              <CardTitle>Exercise Breakdown</CardTitle>
-              <CardDescription>Progress towards monthly goals</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <ResponsiveContainer width="100%" height={300}>
-                <BarChart data={exerciseStats}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
-                  <XAxis 
-                    dataKey="exercise" 
-                    stroke="hsl(var(--muted-foreground))"
-                    tick={{ fontSize: 12 }}
-                  />
-                  <YAxis stroke="hsl(var(--muted-foreground))" />
-                  <Tooltip 
-                    contentStyle={{ 
-                      backgroundColor: 'hsl(var(--card))',
-                      border: '1px solid hsl(var(--border))',
-                      borderRadius: '8px'
-                    }}
-                  />
-                  <Legend />
-                  <Bar 
-                    dataKey="completed" 
-                    fill="hsl(var(--success))" 
-                    radius={[8, 8, 0, 0]}
-                    name="Completed"
-                  />
-                  <Bar 
-                    dataKey="target" 
-                    fill="hsl(var(--muted))" 
-                    radius={[8, 8, 0, 0]}
-                    name="Target"
-                  />
-                </BarChart>
-              </ResponsiveContainer>
+            <CardContent className="py-12 text-center">
+              <p className="text-muted-foreground">No workout data yet. Start your first workout to see analytics!</p>
             </CardContent>
           </Card>
-        </div>
+        )}
 
         {/* Recent Achievements */}
         <Card className="mt-6 border-border bg-card/80 backdrop-blur-xl">
@@ -205,10 +232,10 @@ const Analytics = () => {
           <CardContent>
             <div className="space-y-4">
               {[
-                { title: '7-Day Streak', desc: 'Worked out for 7 consecutive days', icon: Flame, color: 'destructive' },
-                { title: 'Century Club', desc: 'Completed 100 push-ups in a session', icon: Target, color: 'primary' },
-                { title: 'Perfect Form', desc: 'Achieved 95% form accuracy for a workout', icon: TrendingUp, color: 'success' },
-              ].map((achievement, index) => (
+                streak >= 7 && { title: '7-Day Streak', desc: 'Worked out for 7 consecutive days', icon: Flame, color: 'destructive' },
+                totalReps >= 100 && { title: 'Century Club', desc: 'Completed 100 reps in total', icon: Target, color: 'primary' },
+                totalWorkouts >= 10 && { title: 'Consistency King', desc: 'Completed 10 workouts', icon: TrendingUp, color: 'success' },
+              ].filter(Boolean).map((achievement: any, index) => (
                 <div 
                   key={index}
                   className="flex items-center gap-4 p-4 rounded-lg bg-secondary hover:bg-secondary/80 transition-colors"
@@ -223,6 +250,11 @@ const Analytics = () => {
                   <div className="text-2xl">🏆</div>
                 </div>
               ))}
+              {streak < 7 && totalReps < 100 && totalWorkouts < 10 && (
+                <p className="text-center text-muted-foreground py-8">
+                  Keep working out to unlock achievements!
+                </p>
+              )}
             </div>
           </CardContent>
         </Card>

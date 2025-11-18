@@ -1,0 +1,72 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
+All colors MUST be HSL.
+*/
+
+@layer base {
+  :root {
+    --background: 220 20% 8%;
+    --foreground: 210 40% 98%;
+
+    --card: 220 18% 12%;
+    --card-foreground: 210 40% 98%;
+
+    --popover: 220 18% 12%;
+    --popover-foreground: 210 40% 98%;
+
+    --primary: 217 91% 60%;
+    --primary-foreground: 210 40% 98%;
+    --primary-glow: 217 91% 70%;
+
+    --secondary: 220 18% 16%;
+    --secondary-foreground: 210 40% 98%;
+
+    --muted: 220 18% 16%;
+    --muted-foreground: 215 20% 65%;
+
+    --accent: 14 90% 60%;
+    --accent-foreground: 210 40% 98%;
+    --accent-glow: 14 90% 70%;
+
+    --success: 142 76% 56%;
+    --success-foreground: 220 20% 8%;
+
+    --destructive: 0 85% 60%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 220 18% 20%;
+    --input: 220 18% 20%;
+    --ring: 217 91% 60%;
+
+    --radius: 0.75rem;
+
+    /* Gradients */
+    --gradient-primary: linear-gradient(135deg, hsl(217 91% 60%), hsl(217 91% 70%));
+    --gradient-accent: linear-gradient(135deg, hsl(14 90% 60%), hsl(14 90% 70%));
+    --gradient-hero: linear-gradient(180deg, hsl(220 20% 8%), hsl(220 25% 12%));
+    --gradient-mesh: radial-gradient(ellipse at top, hsl(217 91% 60% / 0.15), transparent 50%),
+                     radial-gradient(ellipse at bottom right, hsl(14 90% 60% / 0.1), transparent 50%);
+
+    /* Shadows */
+    --shadow-glow: 0 0 40px hsl(217 91% 60% / 0.3);
+    --shadow-accent-glow: 0 0 40px hsl(14 90% 60% / 0.3);
+    --shadow-elegant: 0 20px 60px -10px hsl(217 91% 60% / 0.4);
+
+    /* Animations */
+    --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-bounce: all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+  }
+}

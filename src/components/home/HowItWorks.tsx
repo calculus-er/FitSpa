@@ -30,7 +30,10 @@ const steps = [
 
 export const HowItWorks = () => {
   return (
-    <section className="py-32 px-6 relative overflow-hidden bg-gradient-to-b from-background to-secondary/20">
+    <section
+      id="how-it-works"
+      className="py-32 px-6 relative overflow-hidden bg-gradient-to-b from-background to-secondary/20"
+    >
       <div className="container mx-auto relative z-10">
         <ParallaxSection speed={0.2}>
           <div className="text-center mb-20">

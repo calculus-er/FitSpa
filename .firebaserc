@@ -1,0 +1,7 @@
+{
+  "projects": {
+    "default": "fitspa-6469a",
+    "production": "fitspa-app",
+    "staging": "fitspa-app-staging"
+  }
+}

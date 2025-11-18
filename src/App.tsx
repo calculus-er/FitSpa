@@ -9,6 +9,8 @@ import Home from "./pages/Home";
 import Auth from "./pages/Auth";
 import Workout from "./pages/Workout";
 import Analytics from "./pages/Analytics";
+import Pricing from "./pages/Pricing";
+import Contact from "./pages/Contact";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -23,6 +25,8 @@ const App = () => (
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/auth" element={<Auth />} />
+            <Route path="/pricing" element={<Pricing />} />
+            <Route path="/contact" element={<Contact />} />
             <Route
               path="/workout"
               element={

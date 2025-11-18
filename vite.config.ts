@@ -15,4 +15,22 @@ export default defineConfig(({ mode }) => ({
       "@": path.resolve(__dirname, "./src"),
     },
   },
+  build: {
+    outDir: "dist",
+    sourcemap: true,
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          vendor: ['react', 'react-dom'],
+          firebase: ['firebase/app', 'firebase/auth', 'firebase/firestore'],
+          ui: ['@radix-ui/react-dialog', '@radix-ui/react-toast', 'lucide-react'],
+          utils: ['clsx', 'tailwind-merge', 'date-fns']
+        }
+      }
+    },
+    chunkSizeWarningLimit: 1000
+  },
+  define: {
+    'process.env.NODE_ENV': JSON.stringify(mode)
+  }
 }));

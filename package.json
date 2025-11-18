@@ -7,8 +7,17 @@
     "dev": "vite",
     "build": "vite build",
     "build:dev": "vite build --mode development",
+    "build:staging": "vite build --mode staging",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "deploy": "chmod +x scripts/deploy.sh && ./scripts/deploy.sh",
+    "deploy:staging": "chmod +x scripts/deploy.sh && ./scripts/deploy.sh staging",
+    "deploy:production": "chmod +x scripts/deploy.sh && ./scripts/deploy.sh production",
+    "deploy:functions": "chmod +x scripts/deploy.sh && ./scripts/deploy.sh functions",
+    "firebase:emulators": "firebase emulators:start",
+    "firebase:serve": "firebase serve --only hosting",
+    "functions:build": "cd functions && npm run build",
+    "functions:serve": "cd functions && npm run serve"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.10.0",

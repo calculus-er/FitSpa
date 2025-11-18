@@ -1,0 +1,52 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Users collection
+    match /users/{userId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+      
+      // User profiles can be read by authenticated users
+      allow read: if request.auth != null && 
+        resource.data.keys().hasAll(['displayName', 'photoURL', 'email']) &&
+        resource.data.privacy == 'public';
+    }
+    
+    // Workouts collection
+    match /users/{userId}/workouts/{workoutId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+      allow create: if request.auth != null && 
+        request.auth.uid == userId &&
+        request.resource.data.keys().hasAll(['exerciseData', 'startTime', 'endTime']);
+    }
+    
+    // Exercise library (public read, admin write)
+    match /exercises/{exerciseId} {
+      allow read: if true;
+      allow write: if request.auth != null && request.auth.token.admin == true;
+    }
+    
+    // User analytics (private)
+    match /users/{userId}/analytics/{analyticsId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+    
+    // User preferences (private)
+    match /users/{userId}/preferences/{prefId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+    
+    // Public leaderboards
+    match /leaderboards/{leaderboardId} {
+      allow read: if true;
+      allow write: if request.auth != null && 
+        request.resource.data.userId == request.auth.uid &&
+        request.resource.data.keys().hasAll(['userId', 'score', 'workoutId', 'timestamp']);
+    }
+    
+    // Deny all other reads/writes
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

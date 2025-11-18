@@ -1,0 +1,31 @@
+{
+  "name": "fitspa-functions",
+  "version": "1.0.0",
+  "description": "Cloud Functions for FitSpa",
+  "scripts": {
+    "build": "tsc",
+    "build:watch": "tsc --watch",
+    "serve": "npm run build && firebase emulators:start --only functions",
+    "shell": "npm run build && firebase functions:shell",
+    "start": "npm run shell",
+    "deploy": "firebase deploy --only functions",
+    "logs": "firebase functions:log",
+    "lint": "eslint src/**/*.ts"
+  },
+  "engines": {
+    "node": "20"
+  },
+  "main": "lib/index.js",
+  "dependencies": {
+    "firebase-admin": "^12.6.0",
+    "firebase-functions": "^5.0.1",
+    "@types/node": "^22.16.5"
+  },
+  "devDependencies": {
+    "typescript": "^5.8.3",
+    "eslint": "^9.32.0",
+    "@typescript-eslint/eslint-plugin": "^8.38.0",
+    "@typescript-eslint/parser": "^8.38.0"
+  },
+  "private": true
+}

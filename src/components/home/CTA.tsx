@@ -1,7 +1,7 @@
-import { Button } from '@/components/ui/button';
-import { ParallaxSection } from '@/components/ParallaxSection';
-import { ArrowRight } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Button } from "@/components/ui/button";
+import { ParallaxSection } from "@/components/ParallaxSection";
+import { ArrowRight } from "lucide-react";
+import { Link } from "react-router-dom";
 
 export const CTA = () => {
   return (
@@ -18,12 +18,23 @@ export const CTA = () => {
             <p className="text-xl text-muted-foreground mb-10 max-w-2xl mx-auto">
               Join thousands of users who are already achieving their fitness goals with AI-powered coaching.
             </p>
-            <Link to="/auth">
-              <Button variant="hero" size="xl" className="group">
-                Start Free Today
-                <ArrowRight className="w-5 h-5 transition-transform group-hover:translate-x-1" />
-              </Button>
-            </Link>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <Link to="/auth">
+                <Button variant="hero" size="xl" className="group">
+                  Start Free Today
+                  <ArrowRight className="w-5 h-5 transition-transform group-hover:translate-x-1" />
+                </Button>
+              </Link>
+              <Link to="/contact">
+                <Button
+                  variant="outline"
+                  size="xl"
+                  className="border-border hover:bg-secondary"
+                >
+                  Talk to us
+                </Button>
+              </Link>
+            </div>
           </div>
         </div>
       </ParallaxSection>

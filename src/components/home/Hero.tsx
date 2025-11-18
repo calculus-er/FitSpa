@@ -1,12 +1,57 @@
-import { Button } from '@/components/ui/button';
-import { ParallaxSection } from '@/components/ParallaxSection';
-import { ArrowRight, Sparkles } from 'lucide-react';
-import { Link } from 'react-router-dom';
-import heroImage from '@/assets/hero-fitness.jpg';
+import { Button } from "@/components/ui/button";
+import { ParallaxSection } from "@/components/ParallaxSection";
+import { ArrowRight, Sparkles } from "lucide-react";
+import { Link } from "react-router-dom";
+import heroImage from "@/assets/hero-fitness.jpg";
+import { NavLink } from "@/components/NavLink";
 
 export const Hero = () => {
   return (
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden bg-gradient-hero">
+      {/* Top Navigation */}
+      <header className="absolute top-0 left-0 right-0 z-20">
+        <div className="container mx-auto px-6 py-6 flex items-center justify-between">
+          <Link to="/" className="text-xl font-semibold tracking-tight">
+            <span className="bg-gradient-to-r from-primary via-primary-glow to-accent bg-clip-text text-transparent">
+              FitSpa
+            </span>
+          </Link>
+          <nav className="hidden md:flex items-center gap-8 text-sm">
+            <NavLink
+              to="/pricing"
+              className="text-muted-foreground hover:text-foreground transition-colors"
+              activeClassName="text-foreground font-semibold"
+            >
+              Pricing
+            </NavLink>
+            <NavLink
+              to="/contact"
+              className="text-muted-foreground hover:text-foreground transition-colors"
+              activeClassName="text-foreground font-semibold"
+            >
+              Contact
+            </NavLink>
+            <a
+              href="#how-it-works"
+              className="text-muted-foreground hover:text-foreground transition-colors"
+            >
+              How it works
+            </a>
+          </nav>
+          <div className="flex items-center gap-3">
+            <Link to="/auth">
+              <Button variant="ghost" className="hidden md:inline-flex">
+                Sign in
+              </Button>
+            </Link>
+            <Link to="/auth">
+              <Button variant="hero" size="sm" className="md:hidden">
+                Start
+              </Button>
+            </Link>
+          </div>
+        </div>
+      </header>
       {/* Animated Background Mesh */}
       <div className="absolute inset-0 bg-gradient-mesh opacity-50" />
       
@@ -53,9 +98,11 @@ export const Hero = () => {
                   <ArrowRight className="w-5 h-5 transition-transform group-hover:translate-x-1" />
                 </Button>
               </Link>
-              <Button variant="outline" size="xl" className="border-border hover:bg-secondary">
-                Learn More
-              </Button>
+              <Link to="/pricing">
+                <Button variant="outline" size="xl" className="border-border hover:bg-secondary">
+                  Explore Pricing
+                </Button>
+              </Link>
             </div>
           </ParallaxSection>
         </div>
